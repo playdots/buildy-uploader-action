@@ -30,8 +30,6 @@ runs:
       shell: bash
       run: echo ::set-output name=target::${TARGET^}
       id: capitalize
-      env:
-        TARGET: ${{ inputs.target }}
       
     - name: Upload Build to S3
       shell: bash
