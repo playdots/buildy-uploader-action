@@ -1,18 +1,6 @@
 name: 'Buildy Uploader'
 description: 'Uploads builds to the Buildy S3 Bucket'
 inputs:
-  # s3-bucket:
-  #   required: true
-  #   description: 'S3 bucket to upload to'
-  # build-name:
-  #   required: true
-  #   description: 'Name of the game'
-  # target:
-  #   required: true
-  #   description: 'Target platform (Android, iOS)'
-  # stability:
-  #   required: true
-  #   description: 'Build stability (Develop, Production, Prototype, etc..)'
   build-directory:
     required: true
     description: 'Path to the directory to be uploaded'
@@ -26,7 +14,8 @@ runs:
       run: echo ::set-output name=branch::${GITHUB_REF#refs/heads/}
       id: extract_branch
 
-    - name: Extract branch name
+    #Buildy uses IOS instead of iOS, this setps capitalizes iOS to IOS
+    - name: Capitalize Target
       shell: bash
       run: echo ::set-output name=target::${TARGET^}
       id: capitalize
