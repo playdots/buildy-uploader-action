@@ -1,0 +1,52 @@
+name: 'Buildy Uploader'
+description: 'Uploads builds to the Buildy S3 Bucket'
+inputs:
+  # s3-bucket:
+  #   required: true
+  #   description: 'S3 bucket to upload to'
+  # build-name:
+  #   required: true
+  #   description: 'Name of the game'
+  # target:
+  #   required: true
+  #   description: 'Target platform (Android, iOS)'
+  # stability:
+  #   required: true
+  #   description: 'Build stability (Develop, Production, Prototype, etc..)'
+  build-directory:
+    required: true
+    description: 'Path to the directory to be uploaded'
+runs:
+  using: "composite"
+  steps:
+
+    #Branch name from GITHUB_REF or ${{ github.head_ref }} include refs/heads/$BranchName This step cleans up the refs/heads/
+    - name: Extract branch name
+      shell: bash
+      run: echo ::set-output name=branch::${GITHUB_REF#refs/heads/}
+      id: extract_branch
+
+    - name: Extract branch name
+      shell: bash
+      run: echo ::set-output name=target::${TARGET^}
+      id: capitalize
+      env:
+        TARGET: ${{ inputs.target }}
+      
+    - name: Upload Build to S3
+      shell: bash
+      run: |
+        aws s3 cp ${{ inputs.build-directory }} s3://$BUILDY_BUCKET/$BUILDY_DIRECTORY --metadata "$METADATA" --recursive --exclude "*.zip"
+      env:
+        METADATA: ${{ format('{{"GitBranch":"{0}", "GitCommit":"{1}", "GitUrl":"{2}"}}', steps.extract_branch.outputs.branch, github.sha, github.repository) }}
+        BUILDY_DIRECTORY: ${{env.BUILD_NAME}}/${{steps.capitalize.outputs.target}}/${{env.STABILITY}}
+      
+      # Sync Buildy Directory Metafile
+    - name: Create S3 Meta Directory
+      shell: bash
+      run: |
+        mkdir meta
+        touch meta/$BUILD_NAME.$TARGET.$STABILITY
+        aws s3 sync meta/. s3://$BUILDY_BUCKET/$BUILDY_META_DIRECTORY
+      env:
+        BUILDY_META_DIRECTORY: '.buildy-web-metadata'
