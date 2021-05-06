@@ -16,9 +16,11 @@ runs:
 
     #Buildy uses IOS instead of iOS, this setps capitalizes iOS to IOS
     - name: Capitalize Target
-      shell: bash
-      run: echo ::set-output name=target::${TARGET^}
+      shell: pwsh
       id: capitalize
+      run: |
+        $result = $env:TARGET.substring(0,1).toupper()+$env:TARGET.substring(1)
+        echo "::set-output name=target::$result"
       
     - name: Upload Build to S3
       shell: bash
