@@ -35,7 +35,8 @@ runs:
       shell: bash
       run: |
         mkdir meta
-        touch meta/$BUILD_NAME.$TARGET.$STABILITY
+        touch meta/$BUILDY_DIRECTORY
         aws s3 sync meta/. s3://$BUILDY_BUCKET/$BUILDY_META_DIRECTORY
       env:
         BUILDY_META_DIRECTORY: '.buildy-web-metadata'
+        BUILDY_DIRECTORY: ${{env.BUILD_NAME}}.${{steps.target.outputs.uppercase}}.${{env.STABILITY}}
