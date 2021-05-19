@@ -39,4 +39,4 @@ runs:
         aws s3 sync meta/. s3://$BUILDY_BUCKET/$BUILDY_META_DIRECTORY
       env:
         BUILDY_META_DIRECTORY: '.buildy-web-metadata'
-        BUILDY_DIRECTORY: ${{env.BUILD_NAME}}.${{steps.target.outputs.uppercase}}.${{env.STABILITY}}
+        BUILDY_DIRECTORY: ${{env.BUILD_NAME}}.${{steps.capitalize.outputs.target}}.${{env.STABILITY}}
